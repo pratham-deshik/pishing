@@ -1,0 +1,42 @@
+import requests
+
+# Define the Flask app's URL (assumes the app is running locally on port 5000)
+base_url = "http://127.0.0.1:5000/predict"
+
+# Define a list of test URLs (including both phishing and legitimate URLs)
+test_urls = [
+    "http://example.com",                # Legitimate URL
+    "https://secure-site.com",           # Legitimate URL
+    "http://phishing-site.com",          # Phishing URL
+    "https://legitimate-site.com",       # Legitimate URL
+    "http://testurl.com",                # Legitimate URL
+    "https://www.google.com",            # Legitimate URL (Google)
+    "https://www.amazon.com",            # Legitimate URL (Amazon)
+    "https://www.bbc.com",               # Legitimate URL (BBC)
+    "http://fake-login.com",             # Phishing URL
+    "https://banking-security.com"       # Phishing URL
+]
+
+# Loop through each URL, send a POST request, and print the result
+for url in test_urls:
+    try:
+        # Send POST request with the URL
+        response = requests.post(base_url, data={'url': url})
+        
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the result (assuming the result is returned in the 'result' field in the template)
+            result = response.text
+            # For this example, we are looking for a prediction in the HTML response.
+            # You may need to parse the response correctly depending on your HTML structure.
+            if 'Phishing' in result:
+                print(f"URL: {url} - Prediction: Phishing")
+            elif 'Legitimate' in result:
+                print(f"URL: {url} - Prediction: Legitimate")
+            else:
+                print(f"URL: {url} - Unexpected result.")
+        else:
+            print(f"Failed to get response for URL: {url}, Status Code: {response.status_code}")
+    
+    except Exception as e:
+        print(f"Error occurred while testing URL {url}: {str(e)}")
